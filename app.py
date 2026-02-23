@@ -1,33 +1,43 @@
 import streamlit as st
+import pandas as pd
+from datetime import date
 
-st.set_page_config(page_title="App Clínica", layout="centered")
+st.set_page_config(page_title="Historias Clínicas", layout="wide")
 
-st.title("🧠 Historia Clínica")
+st.title("Sistema de Historias Clínicas")
 
-st.subheader("Datos del Paciente")
+menu = st.sidebar.selectbox("Menú", ["Agregar paciente", "Ver pacientes"])
 
-nombre = st.text_input("Nombre y Apellido")
-dni = st.text_input("DNI")
-fecha_nac = st.date_input("Fecha de Nacimiento")
-edad = st.number_input("Edad", min_value=0, max_value=120)
-escuela = st.text_input("Escuela")
-grado = st.text_input("Grado")
+if "pacientes" not in st.session_state:
+    st.session_state.pacientes = []
 
-st.subheader("Datos de los Padres")
+if menu == "Agregar paciente":
+    st.subheader("Nuevo paciente")
 
-nombre_padre = st.text_input("Nombre del Padre")
-edad_padre = st.number_input("Edad del Padre", min_value=0, max_value=120)
-trabajo_padre = st.text_input("Actividad Laboral del Padre")
+    nombre = st.text_input("Nombre y Apellido")
+    dni = st.text_input("DNI")
+    nacimiento = st.date_input("Fecha de nacimiento")
+    escuela = st.text_input("Escuela")
+    grado = st.text_input("Grado")
+    motivo = st.text_area("Motivo de consulta")
+    recorrido = st.text_area("Recorrido terapéutico")
 
-nombre_madre = st.text_input("Nombre de la Madre")
-edad_madre = st.number_input("Edad de la Madre", min_value=0, max_value=120)
-trabajo_madre = st.text_input("Actividad Laboral de la Madre")
+    if st.button("Guardar"):
+        st.session_state.pacientes.append({
+            "Nombre": nombre,
+            "DNI": dni,
+            "Nacimiento": nacimiento,
+            "Escuela": escuela,
+            "Grado": grado,
+            "Motivo": motivo,
+            "Recorrido": recorrido
+        })
+        st.success("Paciente guardado")
 
-st.subheader("Motivo de Consulta")
-motivo = st.text_area("Escribir aquí")
-
-st.subheader("Recorrido Terapéutico")
-recorrido = st.text_area("Escribir aquí")
-
-if st.button("Guardar"):
-    st.success("Datos cargados correctamente (modo demostración)")
+if menu == "Ver pacientes":
+    st.subheader("Listado de pacientes")
+    if st.session_state.pacientes:
+        df = pd.DataFrame(st.session_state.pacientes)
+        st.dataframe(df)
+    else:
+        st.info("No hay pacientes cargados")
